@@ -1,0 +1,7 @@
+#import "HPTPhotosViewer-Prefix.pch"
+
+#ifdef __OBJC__
+
+    @import XCTest;
+
+#endif

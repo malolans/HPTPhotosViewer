@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface HPTPhotoViewController : UIViewController
+@interface HPTPhotoViewController : UIViewController <UINavigationControllerDelegate, UIScrollViewDelegate>
+
+@property (nonatomic, strong) UIImage *image;
+@property (weak, nonatomic) IBOutlet UIImageView *photoView;
 
 @end

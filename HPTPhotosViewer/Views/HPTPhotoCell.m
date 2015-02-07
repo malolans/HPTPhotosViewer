@@ -10,4 +10,10 @@
 
 @implementation HPTPhotoCell
 
+- (void)prepareForReuse {
+    [super prepareForReuse];
+    
+    self.imagePC.image = nil;
+}
+
 @end

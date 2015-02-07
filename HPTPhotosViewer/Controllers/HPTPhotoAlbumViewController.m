@@ -8,91 +8,119 @@
 
 #import "HPTPhotoAlbumViewController.h"
 
+#import "HPTPhotoCell.h"
+#import "HPTMoreCell.h"
+
+#import "HPTPhotosCollectionViewController.h"
+
 @interface HPTPhotoAlbumViewController ()
+
+@property (nonatomic, strong) NSMutableArray *photoAlbumArray;
 
 @end
 
-@implementation HPTPhotoAlbumViewController
+static NSString *const reuseIdentifierCell = @"PhotoCell";
+static NSString *const reuseIdentifierMore = @"MoreCell";
+static NSString *const reuseIdentifierSection = @"SectionHeader";
+static NSInteger const maxPhotoCount = 3;
 
-static NSString * const reuseIdentifier = @"Cell";
+@implementation HPTPhotoAlbumViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Uncomment the following line to preserve selection between presentations
-    // self.clearsSelectionOnViewWillAppear = NO;
+    self.photoAlbumArray = [NSMutableArray array];
     
-    // Register cell classes
-    [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:reuseIdentifier];
+    for (NSUInteger count = 0; count < 3; count++) {
+        NSMutableArray *photosArray = [NSMutableArray array];
+        for (NSUInteger photoCount = 0; photoCount < 7; photoCount++) {
+            NSString *fileName = [NSString stringWithFormat:@"%ld%ld.jpg", count, photoCount];
+            UIImage *tempImage = [UIImage imageNamed:fileName];
+            if (tempImage) {
+                [photosArray addObject:tempImage];
+            }
+            else {
+                break;
+            }
+        }
+        [self.photoAlbumArray addObject:photosArray];
+    }
     
-    // Do any additional setup after loading the view.
+    [self setupLayout];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+- (void)setupLayout {
+    CGFloat width = self.collectionView.frame.size.width;
+    CGFloat gutter = 10.0f;
+    CGFloat spacing = 10.0f;
+    
+    CGFloat size = (width - (2 * gutter) - ((maxPhotoCount - 1) * spacing)) / maxPhotoCount;
+    
+    
+    UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionViewLayout;
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+    layout.minimumInteritemSpacing = spacing;
+    layout.itemSize = CGSizeMake(size, size);
+    layout.sectionInset = UIEdgeInsetsMake(5.0f, gutter, 10.0f, gutter);
 }
-*/
 
 #pragma mark <UICollectionViewDataSource>
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-#warning Incomplete method implementation -- Return the number of sections
-    return 0;
+    return (NSInteger)[self.photoAlbumArray count];
 }
 
-
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-#warning Incomplete method implementation -- Return the number of items in the section
-    return 0;
+    NSArray *photosArray = (NSArray *)(self.photoAlbumArray[(NSUInteger)section]);
+    NSInteger photoCount = (NSInteger)[photosArray count];
+    if (photoCount > maxPhotoCount) {
+        return maxPhotoCount;
+    }
+    else {
+        return photoCount;
+    }
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
+    NSArray *photosArray = (NSArray *)(self.photoAlbumArray[(NSUInteger)indexPath.section]);
     
-    // Configure the cell
+    if (indexPath.row == (maxPhotoCount - 1) && [photosArray count] > maxPhotoCount) {
+        HPTMoreCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifierMore forIndexPath:indexPath];
+        cell.moreLabel.text = [NSString stringWithFormat:@"+%li More", [photosArray count] - maxPhotoCount];
+        
+        return cell;
+    }
+    else {
+        UIImage *photo = (UIImage *)photosArray[(NSUInteger)indexPath.row];
+        HPTPhotoCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseIdentifierCell forIndexPath:indexPath];
+        cell.imagePC.image = photo;
+        
+        return cell;
+    }
+}
+
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
+    UICollectionReusableView *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:reuseIdentifierSection forIndexPath:indexPath];
     
-    return cell;
+    return header;
 }
 
-#pragma mark <UICollectionViewDelegate>
-
-/*
-// Uncomment this method to specify if the specified item should be highlighted during tracking
-- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
-	return YES;
-}
-*/
-
-/*
-// Uncomment this method to specify if the specified item should be selected
-- (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
-}
-*/
-
-/*
-// Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-- (BOOL)collectionView:(UICollectionView *)collectionView shouldShowMenuForItemAtIndexPath:(NSIndexPath *)indexPath {
-	return NO;
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    HPTPhotosCollectionViewController *destinationVC = [self.storyboard instantiateViewControllerWithIdentifier:@"PhotosVC"];
+    
+    NSMutableArray *photosArray = (NSMutableArray *)self.photoAlbumArray[(NSUInteger)indexPath.section];
+    destinationVC.photosArray = photosArray;
+    
+    [self.navigationController pushViewController:destinationVC animated:YES];
 }
 
-- (BOOL)collectionView:(UICollectionView *)collectionView canPerformAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender {
-	return NO;
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    HPTPhotoCell *cell = (HPTPhotoCell *)sender;
+    HPTPhotosCollectionViewController *destinationVC = (HPTPhotosCollectionViewController *)segue.destinationViewController;
+    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+    
+    NSMutableArray *photosArray = (NSMutableArray *)self.photoAlbumArray[(NSUInteger)indexPath.section];
+    destinationVC.photosArray = photosArray;
 }
-
-- (void)collectionView:(UICollectionView *)collectionView performAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath withSender:(id)sender {
-	
-}
-*/
 
 @end

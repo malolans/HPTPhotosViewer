@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface HPTPhotosViewController : UICollectionViewController
+@interface HPTPhotosCollectionViewController : UICollectionViewController <UINavigationControllerDelegate>
+
+@property (nonatomic, strong) NSArray *photosArray;
+@property (nonatomic, weak) UIImageView *animatingImageView;
 
 @end

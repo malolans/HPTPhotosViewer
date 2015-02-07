@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface HPTAlbumLayout : UICollectionViewFlowLayout
+@interface HPTPhotosLayout : UICollectionViewFlowLayout
 
 @end

@@ -1,19 +1,10 @@
 # HPTPhotosViewer #
 
-## Setup ##
+HPTPhotosViewer is an Album or Gallery app just like the Photos app in iOS.
 
-Run `bin/setup`
+# Features #
+* Album List view and Gallery view for an Album.
+* Zoom transition from gallery to individual image.
+* Pan and Zoom the idvidual image
 
-This will:
-
- - Install the gem dependencies
- - Install the pod dependencies
-
-## Testing ##
-
-Run `bin/test`
-
-This will run the tests from the command line, and pipe the result through
-[XCPretty][].
-
-[XCPretty]: https://github.com/supermarin/xcpretty
+# Screen Shots #

@@ -10,4 +10,6 @@
 
 @interface HPTMoreCell : UICollectionViewCell
 
+@property (weak, nonatomic) IBOutlet UILabel *moreLabel;
+
 @end

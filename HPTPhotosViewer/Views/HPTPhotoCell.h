@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface HPTPhotoCell : UICollectionViewCell
+@property (weak, nonatomic) IBOutlet UIImageView *imagePC;
 
 @end
